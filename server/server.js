@@ -9,7 +9,7 @@ require("dotenv").config();
 const express = require("express");
 const { exec } = require("child_process");
 const connectDB = require("./db");
-const Message = require("./models/Message");
+const Message = require("./models/message");
 
 // Actually connect to MongoDB when the server starts
 connectDB();
@@ -43,7 +43,7 @@ app.post("/ask", (request, response) => {
 
     const command = `uv run python back.py "${question}"`;
 
-    exec(command, { cwd: "C:\\Users\\HP\\Desktop\\AI Course\\aiportfolio_project" }, async (error, stdout, stderr) => {
+    exec(command, { cwd: "C:\\Users\\HP\\Desktop\\aiportfolio_project_AWS" }, async (error, stdout, stderr) => {
         // NOTE: this callback is now "async" - required because we use
         // "await" inside it to save to MongoDB below.
 
@@ -55,13 +55,14 @@ app.post("/ask", (request, response) => {
         const answer = stdout.trim();
 
         // Save this question+answer pair to MongoDB
+        const visitor_id = request.body.visitor_id;
+
         try {
             await Message.create({
+                visitor_id: visitor_id,
                 question: question,
                 answer: answer
             });
-
-            console.log("Saved to MongoDB!");
 
         } catch (dbError) {
             // if saving fails, we still want to reply to the user -
@@ -78,12 +79,16 @@ app.post("/ask", (request, response) => {
 // GET route to fetch all past messages, oldest first
 app.get("/history", async (request, response) => {
 
-    try {
-        // .find({}) with no filters means "get everything"
-        // .sort({ createdAt: 1 }) means oldest first (1 = ascending)
-        const messages = await Message.find({}).sort({ createdAt: 1 });
+    const visitor_id = request.query.visitor_id;
 
-        response.json(messages);
+    if (!visitor_id) {
+        return response.status(400).json({ error: "No visitor_id provided." });
+    }
+
+    try {
+        const messages = await Message.find({ visitor_id: visitor_id }).sort({ createdAt: 1 });
+
+        response.json({ history: messages });
 
     } catch (error) {
         console.error("Failed to fetch history:", error.message);
