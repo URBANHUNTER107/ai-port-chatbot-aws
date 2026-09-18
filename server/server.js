@@ -3,6 +3,8 @@
 
 require("dotenv").config();
 
+const path = require("path");
+
 // Load Express (our web server toolkit) and Node's built-in
 // "child_process" tool, which lets us run other programs
 // (like Python) from inside our JavaScript code.
@@ -42,8 +44,9 @@ app.post("/ask", (request, response) => {
     }
 
     const command = `uv run python back.py "${question}"`;
+    const projectRoot = path.join(__dirname, "..");
 
-    exec(command, { cwd: "C:\\Users\\HP\\Desktop\\aiportfolio_project_AWS" }, async (error, stdout, stderr) => {
+    exec(command, { cwd: projectRoot }, async (error, stdout, stderr) => {
         // NOTE: this callback is now "async" - required because we use
         // "await" inside it to save to MongoDB below.
 

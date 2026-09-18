@@ -1,6 +1,7 @@
 import hashlib
 import pickle
 from pathlib import Path
+import sys
 
 # where we'll store the saved (cached) embeddings
 CACHE_FILE = Path(__file__).parent.parent / "data" / "embeddings_cache.pkl"
@@ -23,7 +24,7 @@ def load_cached_embeddings(source_json_path):
     """
 
     if not CACHE_FILE.exists():
-        print(f"CACHE DEBUG: cache file does not exist at {CACHE_FILE}")
+        print(f"CACHE DEBUG: cache file does not exist at {CACHE_FILE}", file=sys.stderr)
         return None
 
     current_hash = get_file_hash(source_json_path)
@@ -33,10 +34,10 @@ def load_cached_embeddings(source_json_path):
 
     # if the JSON file has changed since we last cached, the cache is stale
     if cached["source_hash"] != current_hash:
-        print(f"CACHE DEBUG: hash mismatch. cached={cached['source_hash']} current={current_hash}")
+        print(f"CACHE DEBUG: hash mismatch. cached={cached['source_hash']} current={current_hash}", file=sys.stderr)
         return None
 
-    print("CACHE DEBUG: cache hit, using cached embeddings")
+    print("CACHE DEBUG: cache hit, using cached embeddings", file=sys.stderr)
     return cached["chunks"], cached["embeddings"]
 
 
