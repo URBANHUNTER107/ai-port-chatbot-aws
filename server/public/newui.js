@@ -20,14 +20,12 @@ function getOrCreateVisitorId() {
     let id = localStorage.getItem("visitorId");
 
     if (!id) {
-        id = crypto.randomUUID();
+        id = 'id-' + Date.now() + '-' + Math.random().toString(36).slice(2);
         localStorage.setItem("visitorId", id);
     }
 
     return id;
 }
-
-const visitorId = getOrCreateVisitorId();
 
 
 /* ============================================================
