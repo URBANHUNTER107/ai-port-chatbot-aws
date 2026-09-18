@@ -27,6 +27,8 @@ function getOrCreateVisitorId() {
     return id;
 }
 
+const visitorId = getOrCreateVisitorId();
+
 
 /* ============================================================
    ELEMENTS
